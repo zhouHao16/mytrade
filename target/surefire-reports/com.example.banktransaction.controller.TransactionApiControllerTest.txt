@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.banktransaction.controller.TransactionApiControllerTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.100 s -- in com.example.banktransaction.controller.TransactionApiControllerTest

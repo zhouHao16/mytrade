@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-transaction
+  labels:
+    app: bank-transaction
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-transaction
+  template:
+    metadata:
+      labels:
+        app: bank-transaction
+    spec:
+      containers:
+      - name: bank-transaction
+        image: bank-transaction:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: JAVA_OPTS
+          value: "-Xms256m -Xmx512m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-transaction
+spec:
+  selector:
+    app: bank-transaction
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer 
