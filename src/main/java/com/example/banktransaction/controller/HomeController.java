@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     
     /**
-     * 首页，重定向到交易列表
+     * 首页，重定向到静态页面
      */
     @GetMapping("/")
     public String home() {
-        return "redirect:/transactions";
+        return "redirect:/index.html";
     }
 } 

@@ -133,17 +133,35 @@ public class DataInitializer implements CommandLineRunner {
      * 生成随机日期时间（最近n天内）
      */
     private LocalDateTime randomDateTime(int daysBack) {
-        long minDay = LocalDateTime.now().minusDays(daysBack).toLocalDate().toEpochDay();
-        long maxDay = LocalDateTime.now().toLocalDate().toEpochDay();
+        // 获取当前时间作为上限
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 计算最早的可能日期（当前时间前daysBack天）
+        long minDay = now.minusDays(daysBack).toLocalDate().toEpochDay();
+        long maxDay = now.toLocalDate().toEpochDay();
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay + 1);
         
-        LocalDateTime randomDate = LocalDateTime.now()
-                .withHour(random.nextInt(24))
-                .withMinute(random.nextInt(60))
-                .withSecond(random.nextInt(60));
-                
-        if (randomDay < maxDay) {
-            randomDate = randomDate.toLocalDate().atTime(
+        // 将随机天数转换为LocalDate
+        java.time.LocalDate randomLocalDate = java.time.LocalDate.ofEpochDay(randomDay);
+        
+        // 根据随机天数创建LocalDateTime
+        LocalDateTime randomDate;
+        
+        if (randomDay == maxDay) {
+            // 如果是当天，确保时间不超过当前时间
+            int maxHour = now.getHour();
+            int hour = random.nextInt(maxHour + 1); // 0到当前小时
+            
+            int maxMinute = (hour == maxHour) ? now.getMinute() : 59;
+            int minute = random.nextInt(maxMinute + 1);
+            
+            int maxSecond = (hour == maxHour && minute == maxMinute) ? now.getSecond() : 59;
+            int second = random.nextInt(maxSecond + 1);
+            
+            randomDate = randomLocalDate.atTime(hour, minute, second);
+        } else {
+            // 如果不是当天，时分秒可以是任意值
+            randomDate = randomLocalDate.atTime(
                     random.nextInt(24),
                     random.nextInt(60),
                     random.nextInt(60)
