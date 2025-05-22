@@ -81,16 +81,27 @@ function renderTransactionTable(pageResult) {
     pageResult.content.forEach(transaction => {
         const row = document.createElement('tr');
         
-        // 格式化交易时间
-        const transactionTime = new Date(transaction.transactionTime);
-        const formattedTime = transactionTime.toLocaleString('zh-CN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        // 格式化交易时间 - 修复时区问题
+        const transactionTimeStr = transaction.transactionTime;
+        let formattedTime = '-';
+        
+        if (transactionTimeStr) {
+            // 将ISO字符串解析为Date对象
+            const transactionTime = new Date(transactionTimeStr);
+            
+            // 本地化显示日期和时间，使用浏览器的本地时区
+            formattedTime = transactionTime.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // 使用24小时制
+            });
+            
+            console.log('原始时间:', transactionTimeStr, '显示时间:', formattedTime);
+        }
         
         // 确定状态样式
         let statusClass = 'bg-secondary';

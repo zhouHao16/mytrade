@@ -113,15 +113,26 @@ function handleFormSubmit(event) {
         return;
     }
     
+    // 正确处理交易时间，避免时区问题
+    let transactionDateTime;
+    if (transactionTime) {
+        // 将本地日期时间转换为UTC时间
+        transactionDateTime = new Date(transactionTime);
+        // 格式化成后端期望的格式 "yyyy-MM-dd HH:mm:ss"
+    }
+    
     // 构建提交数据
     const transaction = {
         id: id || null,
         type: type,
         amount: parseFloat(amount),
-        transactionTime: new Date(transactionTime).toISOString(),
+        // 使用后端期望的格式，不包含时区信息
+        transactionTime: transactionDateTime ? formatDateTime(transactionDateTime) : null,
         status: status,
         description: description
     };
+    
+    console.log('提交的交易时间:', transaction.transactionTime);
     
     // 判断是创建还是编辑
     const isCreate = !id;
@@ -170,4 +181,16 @@ function showAlert(message, type = 'info') {
             alert.remove();
         }
     }, 5000);
+}
+
+// 格式化日期时间为后端期望的格式 "yyyy-MM-dd HH:mm:ss"
+function formatDateTime(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 } 
